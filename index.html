@@ -16,11 +16,11 @@
 </head>
 
 <body>
-  <header class="jumbotron">
-    <h1 class="display-3">Weather Dashboard</h1>
+  <header>
+    <h1>Weather Dashboard</h1>
   </header>
-  <main>
-    <aside>
+  <section class="container row">
+    <aside class="col-4">
       <section class="city-search">
         <h2>Search for a City:</h2>
         <form>
@@ -29,17 +29,22 @@
         </form>
       </section>
       <section class="saved-cities">
-        
+
       </section>
     </aside>
-  </main>
+    <main class="col-8">
+      <section class="city-details"></section>
+      <section class="five-day-wrap">
+        <h4>5-Day Forecast:</h4>
+        <div class="five-day-cards"></div>
+      </section>
+    </main>
+  </section>
   <footer>
     <div class="container">
       <div style="padding: 20px 0; text-align: center;">Copyright &copy; 2022. Server-Side APIs Challenge: Weather Dashboard coded by Tori Booker.</div>
     </div>
   </footer>
-  <!--https://api.openweathermap.org/data/2.5/forecast?lat={lat}&lon={lon}&appid={API key}
-  https://api.openweathermap.org/data/2.5/forecast?lat={lat}&lon={lon}&appid=a34fcc159752966bf9fcfe3de164b68e -->
   <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
   <script src="./assets/js/script.js"></script>
