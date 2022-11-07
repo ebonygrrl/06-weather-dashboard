@@ -1,18 +1,60 @@
-function getApi(city, zip) {
-    // Create local variables
-    var api = 'a34fcc159752966bf9fcfe3de164b68e';
-    // fetch request gets a list of all the repos for the node.js organization
-    var requestCity     = 'http://api.openweathermap.org/geo/1.0/direct?q=' + city + '&limit=5&appid=' + api;
+// Create global variables
+var form = document.getElementById('weather-search');
 
-    //var requestCity     = 'http://api.openweathermap.org/geo/1.0/direct?q=' + city + '&zip=' + zip + '&limit=5&appid=' + api;
-    var requestWeather = 'https://api.openweathermap.org/data/2.5/forecast?lat={lat}&lon={lon}&appid=' + api;
-  
-    fetch(requestCity)
+function getApi(e) {    
+    e.preventDefault();
+    
+    // Create local variables
+    var details = $('.city-details');
+    var city = $('#city').val();
+    var api = 'a34fcc159752966bf9fcfe3de164b68e';
+
+    // Fetch request
+    var requestCity = 'https://api.openweathermap.org/data/2.5/forecast?q=' + city + '&units=imperial&appid=' + api; 
+
+   fetch(requestCity)
       .then(function (response) {
         return response.json();
       })
       .then(function (data) {
-        console.log(data.json);
+        console.log(data);
+        console.log('---------------------------');
+        console.log(data.list);
+        console.log('---------------------------');
+        
+        var myCity =  '<h3>' + data.city.name + '</h3>';
+        var degree = ' &#8457;';
+
+        for (let i=0; i < data.list.length; i++){
+          var date =  moment(data.list[i].dt_txt).format('M/D/YYYY');
+          var temp = data.list[i].main.temp + degree;
+          var wind = data.list[i].wind.speed + ' MPH';
+          var humid = data.list[i].main.humidity + ' %';
+         
+          //'img src="http://openweathermap.org/img/wn/' + icon + '.png';
+          for (let j=0; j < data.list[i].weather.length; j++) {
+            
+          var icon = data.list[i].weather[j].icon;
+          }
+          
+          console.log(date + ',' + icon + ',' + temp + ',' + wind + ',' + humid);
+
+          if (i === 0) {
+            details.append(myCity);
+          }
+        }
+        /* 
+        City details:
+        Name (date) weather emoji
+        => data.city.name (=> data.list[i].dt) 
+
+        Temp: 80 F
+
+        Wind:
+
+        Humidity:
+        */
+
         /*
         var tableBody = document.getElementById('repo-table');
   
@@ -34,6 +76,10 @@ function getApi(city, zip) {
           tableBody.appendChild(createTableRow);
         }*/
       });
-  }
-  
-  getApi();
+
+      form.reset();
+      $('#city').focus();
+      return;
+}
+
+form.addEventListener('submit', getApi);
