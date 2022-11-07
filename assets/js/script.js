@@ -5,9 +5,10 @@ function getApi(e) {
     e.preventDefault();
     
     // Create local variables
+    var city    = $('#city').val();
     var details = $('.city-details');
-    var city = $('#city').val();
-    var api = 'a34fcc159752966bf9fcfe3de164b68e';
+    var fiveDay = $('.five-day-cards');
+    var api     = 'a34fcc159752966bf9fcfe3de164b68e';
 
     // Fetch request
     var requestCity = 'https://api.openweathermap.org/data/2.5/forecast?q=' + city + '&units=imperial&appid=' + api; 
@@ -22,64 +23,48 @@ function getApi(e) {
         console.log(data.list);
         console.log('---------------------------');
         
-        var myCity =  '<h3>' + data.city.name + '</h3>';
+        var myCity =  data.city.name;
         var degree = ' &#8457;';
 
         for (let i=0; i < data.list.length; i++){
           var date =  moment(data.list[i].dt_txt).format('M/D/YYYY');
-          var temp = data.list[i].main.temp + degree;
-          var wind = data.list[i].wind.speed + ' MPH';
-          var humid = data.list[i].main.humidity + ' %';
-         
-          //'img src="http://openweathermap.org/img/wn/' + icon + '.png';
-          for (let j=0; j < data.list[i].weather.length; j++) {
-            
-          var icon = data.list[i].weather[j].icon;
-          }
+          var temp = $('<div>').html('Temp: ' + data.list[i].main.temp + degree);
+          var wind = $('<div>').html('Wind: ' + data.list[i].wind.speed + ' MPH');
+          var humid = $('<div>').html('Humidity: ' + data.list[i].main.humidity + ' %');
           
-          console.log(date + ',' + icon + ',' + temp + ',' + wind + ',' + humid);
+          for (let j=0; j < data.list[i].weather.length; j++) {            
+            var icon = '<img src="http://openweathermap.org/img/wn/' + data.list[i].weather[j].icon + '.png">';
+          }
+
+          //console.log(date + ',' + icon + ',' + temp + ',' + wind + ',' + humid);
+          var cityHead = $('<div>').addClass('city-name').html('<h3>' + myCity + ' (' + date + ') ' + icon + '</h3>');
+          var card     = $('<div>').addClass('col-lg-2 col-md-6');
 
           if (i === 0) {
-            details.append(myCity);
+            details
+              .append(cityHead)
+              .append(temp)
+              .append(wind)
+              .append(humid);
+          } else if (i > 0 && i <= 5 ) {
+              card
+                .append(date)
+                .append(icon)
+                .append(temp)
+                .append(wind)
+                .append(humid);
+
+                // Add 5 day cards to container
+                fiveDay.append(card);
           }
         }
-        /* 
-        City details:
-        Name (date) weather emoji
-        => data.city.name (=> data.list[i].dt) 
-
-        Temp: 80 F
-
-        Wind:
-
-        Humidity:
-        */
-
-        /*
-        var tableBody = document.getElementById('repo-table');
-  
-        //Loop over the data to generate a table, each table row will have a link to the repo url
-        for (var i = 0; i < data.length; i++) {
-          // Creating elements, tablerow, tabledata, and anchor
-          var createTableRow = document.createElement('tr');
-          var tableData = document.createElement('td');
-          var link = document.createElement('a');
-  
-          // Setting the text of link and the href of the link
-          link.textContent = data[i].html_url;
-          link.href = data[i].html_url;
-  
-          // Appending the link to the tabledata and then appending the tabledata to the tablerow
-          // The tablerow then gets appended to the tablebody
-          tableData.appendChild(link);
-          createTableRow.appendChild(tableData);
-          tableBody.appendChild(createTableRow);
-        }*/
       });
 
+      // Refresh form
       form.reset();
       $('#city').focus();
+
       return;
 }
-
+// Initiate function when search button clicked
 form.addEventListener('submit', getApi);
