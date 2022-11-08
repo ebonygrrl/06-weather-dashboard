@@ -1,8 +1,10 @@
 // Create global variables
-var form   = document.getElementById('weather-search');
-var count  = 0;
+var form       = document.getElementById('weather-search');
+var searchList = $('#saved-cities');
+var recent     = $('.recent-search');
+var count      = 0;
 
-function getApi(e) {    
+function getApi(btnSearch, e) {    
     e.preventDefault();
     
     // Create local variables
@@ -14,8 +16,11 @@ function getApi(e) {
     var api     = 'a34fcc159752966bf9fcfe3de164b68e';
 
     // Fetch request URL
-    var requestCity = 'https://api.openweathermap.org/data/2.5/forecast?q=' + city.val() + '&limit=1&units=imperial&appid=' + api;
-
+    if (city.val()) {
+      var requestCity = 'https://api.openweathermap.org/data/2.5/forecast?q=' + city.val() + '&limit=1&units=imperial&appid=' + api;
+    } else {
+      var requestCity = 'https://api.openweathermap.org/data/2.5/forecast?q=' + btnSearch + '&limit=1&units=imperial&appid=' + api;
+    }
    fetch(requestCity)
       .then(function (response) {
         return response.json();
@@ -43,29 +48,27 @@ function getApi(e) {
             }
 
             var cityHead = $('<div>').addClass('city-name').html('<h2>' + myCity + ' (' + nDate + ') ' + icon + '</h2>');
-
+            
             if (i === 0) {
               details.append(cityHead).append(temp).append(wind).append(humid);
             } else if (sDate && i > 0 && i < 6) {                            
               card.append(nDate).append(icon).append(temp).append(wind).append(humid);
-            }        
-            
+            }  
+
             // Add 5 day cards to container
-            fiveDay.html(card);
+            fiveDay.append(card);
 
-          } // End first for loop
+          } // End first for-loop
 
-          cardHdr.prepend('<h4>5-Day Forecast:</h4>');
+          cardHdr.html('<h4>5-Day Forecast:</h4>');
           details.addClass('city-details-css');  
         } // End of outputDetails function
 
-        if (details.html('')) {
+        if (details.is(':empty')) {
           outputDetails();
         } else {
           details.html('');
           outputDetails();
-          $('.five-day-wrap').html('');
-          fiveDay.html('');
         }
       })
       .catch(function () {
@@ -87,23 +90,31 @@ function getApi(e) {
 }
 
 function init() {
-  var storage = window.localStorage;
+  var storage  = window.localStorage;
+  var listCity = '';
+  var recall   = '';
+  var getVal;   
 
   // Retrieve saved data
   if (storage.length > 0) {
     for (var i=1; i <= storage.length; i++) {
-      var recall = 'search-' + i;
-      var getVal = localStorage.getItem(recall);
-      var listCity = $('<button>').addClass(recall).html(getVal);
-      if (listCity.html('')) {
-        $('.saved-cities').append(listCity);
-        console.log('no text');
-      } else {
-        listCity.replaceWith(listCity);
-        console.log('text');
-      }
+      recall = 'search-' + i;
+      getVal = localStorage.getItem(recall);
+      listCity += '<button class="search-' + i + ' recent-search">' + getVal + '</button>';
     }
+    searchList.html(listCity);
+  } else {
+    recall = 'search-0';
+    getVal = localStorage.getItem(recall);
+    listCity = '<button class="search-' + i + ' recent-search">' + getVal + '</button>';
+    searchList.html(listCity);
   }
+
+  // Get search names
+  $('.recent-search').on('click', function () {
+    var btnSearch = $(this).html();
+    getApi(btnSearch, event);
+  });
 }
 
 // Initiate function when search button clicked
