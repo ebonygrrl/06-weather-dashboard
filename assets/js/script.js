@@ -1,5 +1,6 @@
 // Create global variables
-var form = document.getElementById('weather-search');
+var form   = document.getElementById('weather-search');
+var count  = 0;
 
 function getApi(e) {    
     e.preventDefault();
@@ -19,7 +20,7 @@ function getApi(e) {
       })
       .then(function (data) {
         var list   = data.list;
-        var myCity =  data.city.name;
+        var myCity = data.city.name;
         var degree = ' &#8457;';
         var sDate; 
 
@@ -37,7 +38,7 @@ function getApi(e) {
             var icon = '<img src="http://openweathermap.org/img/wn/' + list[i].weather[j].icon + '.png">';
           }
 
-          var cityHead = $('<div>').addClass('city-name').html('<h3>' + myCity + ' (' + nDate + ') ' + icon + '</h3>');
+          var cityHead = $('<div>').addClass('city-name').html('<h2>' + myCity + ' (' + nDate + ') ' + icon + '</h2>');
 
           // Output data
           if (i === 0) {
@@ -50,13 +51,50 @@ function getApi(e) {
           // Add 5 day cards to container
           fiveDay.append(card);
         }
+
+        $('.five-day-wrap').prepend('<h4>5-Day Forecast:</h4>');
+        details.addClass('city-details-css');
+
+      })
+      .catch(function err () {
+        alert("Please enter a city");
       });
+
+      // Store search in local storage
+      if (city.val() !== "") {
+        count += 1;
+        var search = 'search-' + count;
+        localStorage.setItem(search,city.val());    
+      }
 
       // Refresh form
       form.reset();
       city.focus();
 
-      return;
+      init();
 }
+
+function init() {
+  var storage = window.localStorage;
+
+  // Retrieve saved data
+  if (storage.length > 0) {
+    for (var i=1; i <= storage.length; i++) {
+      var recall = 'search-' + i;
+      var getVal = localStorage.getItem(recall);
+      var listCity = $('<button>').addClass(recall).html(getVal);
+      if (listCity.html('')) {
+        $('.saved-cities').append(listCity);
+        console.log('no text');
+      } else {
+        listCity.replaceWith(listCity);
+        console.log('text');
+      }
+    }
+  }
+}
+
 // Initiate function when search button clicked
 form.addEventListener('submit', getApi);
+
+init();
