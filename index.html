@@ -6,7 +6,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta http-equiv="X-UA-Compatible" content="ie=edge" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.2/css/bootstrap-grid.min.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css" />
   <link rel="stylesheet" href="./assets/css/normalize.css" />
   <link rel="stylesheet" href="./assets/css/style.css" />
   <title>Weather Dashboard | Tori Booker</title>
@@ -16,24 +15,21 @@
   <header>
     <h1>Weather Dashboard</h1>
   </header>
-  <section class="container row">
-    <aside class="col-4">
+  <section class="container row main">
+    <aside class="col-md-3 col-sm-12">
       <section class="city-search">
         <h2>Search for a City:</h2>
         <form id="weather-search">
-          <input id="city"  class="col-12" type="text" name="city" placeholder="Search by city" value="">
-          <button id="submit"  class="col-12" type="submit">Search</button>
+          <input id="city" type="text" name="city" placeholder="Search by city" value="">
+          <button id="submit" type="submit">Search</button>
         </form>
       </section>
-      <section class="saved-cities">
-
-      </section>
+      <section class="saved-cities"></section>
     </aside>
-    <main class="col-8">
+    <main class="col-md-9 col-sm-12">
       <section class="city-details"></section>
       <section class="five-day-wrap">
-        <h4>5-Day Forecast:</h4>
-        <div class="row d-flex justify-content-center five-day-cards"></div>
+        <div class="row d-flex justify-content-around five-day-cards"></div>
       </section>
     </main>
   </section>
