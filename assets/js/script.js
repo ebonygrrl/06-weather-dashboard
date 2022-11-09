@@ -1,59 +1,65 @@
-// Create global letiables
-let form       = document.getElementById('weather-search');
-let searchList = $('#saved-cities');
-let count      = 0;
+// Create global variables
+var form   = document.getElementById('weather-search');
+var count  = 0;
 
-function getApi(e) {    
-  e.preventDefault();
-  
-  // Create local letiables
-  let city    = $('#city');
-  let details = $('.city-details');
-  let fiveDay = $('.five-day-cards');
-  let cardHdr = $('.five-day-wrap');
-  let api     = 'a34fcc159752966bf9fcfe3de164b68e';  
+function getApi(citySearch) {    
+    e.preventDefault();
+    
+    // Create local variables
+    var details = $('.city-details');
+    var fiveDay = $('.five-day-cards');
+    var cardHdr = $('.five-day-wrap');
+    var card    = $('<div>').addClass('col-lg-2 col-md-6');
+    var api     = 'a34fcc159752966bf9fcfe3de164b68e';
 
-  // Fetch request URL 
-  let requestCity = 'https://api.openweathermap.org/data/2.5/forecast?q=' + city.val() + '&limit=1&units=imperial&appid=' + api;
-  
-  fetch(requestCity)
-    .then(function (response) {
-      return response.json();
-    })
-    .then(function (data) {
-      let list   = data.list;
-      let myCity = data.city.name;
-      let degree = ' &#8457;';
-      let card   = '';
-      let outputTop = '';
-      let sDate; 
-      
-      for (let i=0; i < list.length; i++) {
-        let date  = list[i].dt_txt; 
-        let nDate = moment(date).format('M/D/YYYY');
-        let temp  = $('<div>').html('Temp: ' + list[i].main.temp + degree);
-        let wind  = $('<div>').html('Wind: ' + list[i].wind.speed + ' MPH');
-        let humid = $('<div>').html('Humidity: ' + list[i].main.humidity + ' %'); 
-        let icon  = '';
+    if (!citySearch) {
+      citySearch = $('#city').val();  
+    } else {
+      citySearch
+    }
 
-        // I just need ONE DATE out of 5 timestamps!!!
-        sDate = date.indexOf('12:00:00') > -1;
+    // Fetch request URL
+    var requestCity = 'https://api.openweathermap.org/data/2.5/forecast?q=' + citySearch + '&limit=1&units=imperial&appid=' + api;
 
-        for (let j=0; j < list[i].weather.length; j++) {            
-          icon = '<img src="http://openweathermap.org/img/wn/' + list[i].weather[j].icon + '.png">';
+   fetch(requestCity)
+      .then(function (response) {
+        return response.json();
+      })
+      .then(function (data) {
+          var list   = data.list;
+          var myCity = data.city.name;
+          var degree = ' &#8457;';
+          var sDate; 
+
+            // I just need ONE DATE out of 5 timestamps!!!
+            sDate = date.indexOf('12:00:00') > -1;
+
+            for (let j=0; j < list[i].weather.length; j++) {            
+              var icon = '<img src="http://openweathermap.org/img/wn/' + list[i].weather[j].icon + '.png">';
+            }
+
+            var cityHead = $('<div>').addClass('city-name').html('<h2>' + myCity + ' (' + nDate + ') ' + icon + '</h2>');
+
+            if (i === 0) {
+              details.append(cityHead).append(temp).append(wind).append(humid);
+            } else if (sDate && i > 0 && i < 6) {                            
+              card.append(nDate).append(icon).append(temp).append(wind).append(humid);
+            }        
+            
+            // Add 5 day cards to container
+            fiveDay.html(card);
+
+          cardHdr.prepend('<h4>5-Day Forecast:</h4>');
+          details.addClass('city-details-css'); 
+
+        if (details.html('')) {
+          outputDetails();
+        } else {
+          details.html('');
+          outputDetails();
+          $('.five-day-wrap').html('');
+          fiveDay.html('');
         }
-
-        let cityHead = $('<div>').addClass('city-name').html('<h2>' + myCity + ' (' + nDate + ') ' + icon + '</h2>');
-        console.log(cityHead);
-        // Output data
-        if (i === 0) {
-          outputTop = `${cityHead} ${temp} ${wind} ${humid}`;
-          console.log(outputTop);
-          //details.html(cityHead).append(temp).append(wind).append(humid);
-        } else if (sDate) {      
-          card = `<div class="col-lg-2 col-md-6"> ${nDate} ${icon} ${temp} ${wind} ${humid} </div>`; 
-        }
-      } // End first for-loop
 
       // Add 5 day cards to container
       fiveDay.append(card); 
@@ -81,26 +87,23 @@ function getApi(e) {
 }
 
 function init() {
-  let storage  = window.localStorage;
-  let listCity = '';
-  let recall   = '';
-  let getVal;   
+  var storage = window.localStorage;
 
   // Retrieve saved data
   if (storage.length > 0) {
-    for (let i=1; i <= storage.length; i++) {
-      recall = 'search-' + i;
-      getVal = localStorage.getItem(recall);
-      listCity += '<button class="search-' + i + ' recent-search">' + getVal + '</button>';
+    for (var i=1; i <= storage.length; i++) {
+      var recall = 'search-' + i;
+      var getVal = localStorage.getItem(recall);
+      var listCity = $('<button>').addClass(recall).html(getVal);
+      if (listCity.html('')) {
+        $('.saved-cities').append(listCity);
+        console.log('no text');
+      } else {
+        listCity.replaceWith(listCity);
+        console.log('text');
+      }
     }
-    searchList.html(listCity);
-  } 
-
-  // Get search names
-  $('.recent-search').on('click', function (e) {
-    let btnsearch = $(this).html();
-    //getApi(btnsearch);
-  });
+  }
 }
 
 // Initiate function when search button clicked
