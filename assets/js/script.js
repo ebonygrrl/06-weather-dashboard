@@ -19,48 +19,52 @@ function getApi(citySearch) {
   }
 
   // Fetch request URL
-  var requestCity = 'https://api.openweathermap.org/data/2.5/forecast?q=' + citySearch + '&limit=1&units=imperial&appid=' + api;
+  var requestCity = `https://api.openweathermap.org/data/2.5/forecast?q=${citySearch}&limit=1&units=imperial&appid=${api}`;
 
   fetch(requestCity)
     .then(function (response) {
       return response.json();
     })
     .then(function (data) {
-      var list = data.list;
+      var list   = data.list;
       var myCity = data.city.name;
       var degree = ' &#8457;';
+      var output = '';
+      var card   = '';
       var sDate;
       
       for (let i = 0; i < list.length; i++) {
-        var date = list[i].dt_txt;
+        var date  = list[i].dt_txt;
         var nDate = moment(date).format('M/D/YYYY');
-        var temp = '<div>Temp: ' + list[i].main.temp + degree + '</div>';
-        var wind = '<div>Wind: ' + list[i].wind.speed + ' MPH</div>';
-        var humid = '<div>Humidity: ' + list[i].main.humidity + ' %</div>';
+        var temp  = `<div>Temp: ${list[i].main.temp} ${degree} </div>`;
+        var wind  = `<div>Wind: ${list[i].wind.speed} MPH</div>`;
+        var humid = `<div>Humidity: ${list[i].main.humidity} %</div>`;
 
         // I just need ONE DATE out of 5 timestamps!!!
         sDate = date.indexOf('12:00:00') > -1;
 
         for (let j = 0; j < list[i].weather.length; j++) {
-          var icon = '<img src="http://openweathermap.org/img/wn/' + list[i].weather[j].icon + '.png">';
+          var icon = `<img src="http://openweathermap.org/img/wn/${list[i].weather[j].icon}.png">`;
         }
 
-        var cityHead = '<div class="city-name"><h2>' + myCity + ' (' + nDate + ') ' + icon + '</h2>';
+        var cityHead = `<div class="city-name"><h2>${myCity} (${nDate}) ${icon}</h2>`;
 
-        if (i === 0) {
-          var output = `${cityHead} ${temp} ${wind} ${humid}`;
+        if (i === 0 && sDate === false) {
+          output = `${cityHead} ${temp} ${wind} ${humid}`;
           details.html(output).addClass('city-details-css');
         } else if (sDate) {
-          var card = `<div class="col-lg-2 col-md-6"> ${nDate} ${icon} ${temp} ${wind} ${humid} </div>`;
+          card += `<div class="col-lg-2 col-md-6"> ${nDate} ${icon} ${temp} ${wind} ${humid} </div>`;
         }        
       }
 
+      // Return only 5 days
       let counter = 4
       while (counter >= 0) {
-        cards.append(card);
+        cards.html(card);
         counter--;
       }
 
+      // Forecast text
       cardHdr.innerHTML = `<h4>5-Day Forecast:</h4>`;
 
     });
@@ -85,17 +89,17 @@ function init() {
   var recall   = '';
   var getVal;   
 
-  // Retrieve saved data
+  // Retrieve saved data and build history buttons
   if (storage.length > 0) {
     for (var i=1; i <= storage.length; i++) {
-      recall = 'search-' + i;
+      recall = `search-${i}`;
       getVal = localStorage.getItem(recall);
-      listCity += '<button class="search-' + i + ' recent-search">' + getVal + '</button>';
+      listCity += `<button class="search-${i} recent-search">${getVal}</button>`;
     }
     searchList.html(listCity);
   } 
 
-  // Get search names
+  // Get previous city search
   $('.recent-search').on('click', function () {
     var citySearch = $(this).html();
     getApi(citySearch);
