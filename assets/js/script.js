@@ -1,112 +1,115 @@
 // Create global variables
-var form   = document.getElementById('weather-search');
-var count  = 0;
+var form       = document.getElementById('weather-search');
+var searchList = $('#saved-cities');
+var recent     = $('.recent-search');
+var count      = 0;
 
-function getApi(e) {    
-    e.preventDefault();
-    
-    // Create local variables
-    var city    = $('#city');
-    var details = $('.city-details');
-    var fiveDay = $('.five-day-cards');
-    var cardHdr = $('.five-day-wrap');
-    var card    = $('<div>').addClass('col-lg-2 col-md-6');
-    var api     = 'a34fcc159752966bf9fcfe3de164b68e';
+function getApi(citySearch) {
 
-    // Fetch request URL
-    var requestCity = 'https://api.openweathermap.org/data/2.5/forecast?q=' + city.val() + '&limit=1&units=imperial&appid=' + api;
+  // Create local variables
+  var details = $('.city-details');
+  var cardHdr = document.getElementById('five-day-txt');
+  var cards   = $('#five-day-cards').html('');
+  var api     = 'a34fcc159752966bf9fcfe3de164b68e';
 
-   fetch(requestCity)
-      .then(function (response) {
-        return response.json();
-      })
-      .then(function (data) {
-        // Output data
-        var outputDetails = function() {
-          var list   = data.list;
-          var myCity = data.city.name;
-          var degree = ' &#8457;';
-          var sDate; 
+  if (!citySearch) {
+    citySearch = $('#city').val();
+  } else {
+    citySearch
+  }
 
-          for (let i=0; i < list.length; i++) {
-            var date  = list[i].dt_txt; 
-            var nDate = moment(date).format('M/D/YYYY');
-            var temp  = $('<div>').html('Temp: ' + list[i].main.temp + degree);
-            var wind  = $('<div>').html('Wind: ' + list[i].wind.speed + ' MPH');
-            var humid = $('<div>').html('Humidity: ' + list[i].main.humidity + ' %'); 
+  // Fetch request URL
+  var requestCity = `https://api.openweathermap.org/data/2.5/forecast?q=${citySearch}&limit=1&units=imperial&appid=${api}`;
 
-            // I just need ONE DATE out of 5 timestamps!!!
-            sDate = date.indexOf('12:00:00') > -1;
+  fetch(requestCity)
+    .then(function (response) {
+      return response.json();
+    })
+    .then(function (data) {
+      var list   = data.list;
+      var myCity = data.city.name;
+      var degree = ' &#8457;';
+      var output = '';
+      var card   = '';
+      var sDate;
+      
+      for (let i = 0; i < list.length; i++) {
+        var date  = list[i].dt_txt;
+        var nDate = moment(date).format('M/D/YYYY');
+        var temp  = `<div>Temp: ${list[i].main.temp} ${degree} </div>`;
+        var wind  = `<div>Wind: ${list[i].wind.speed} MPH</div>`;
+        var humid = `<div>Humidity: ${list[i].main.humidity} %</div>`;
 
-            for (let j=0; j < list[i].weather.length; j++) {            
-              var icon = '<img src="http://openweathermap.org/img/wn/' + list[i].weather[j].icon + '.png">';
-            }
+        // I just need ONE DATE out of 5 timestamps!!!
+        sDate = date.indexOf('12:00:00') > -1;
 
-            var cityHead = $('<div>').addClass('city-name').html('<h2>' + myCity + ' (' + nDate + ') ' + icon + '</h2>');
-
-            if (i === 0) {
-              details.append(cityHead).append(temp).append(wind).append(humid);
-            } else if (sDate && i > 0 && i < 6) {                            
-              card.append(nDate).append(icon).append(temp).append(wind).append(humid);
-            }        
-            
-            // Add 5 day cards to container
-            fiveDay.html(card);
-
-          } // End first for loop
-
-          cardHdr.prepend('<h4>5-Day Forecast:</h4>');
-          details.addClass('city-details-css');  
-        } // End of outputDetails function
-
-        if (details.html('')) {
-          outputDetails();
-        } else {
-          details.html('');
-          outputDetails();
-          $('.five-day-wrap').html('');
-          fiveDay.html('');
+        for (let j = 0; j < list[i].weather.length; j++) {
+          var icon = `<img src="http://openweathermap.org/img/wn/${list[i].weather[j].icon}.png">`;
         }
-      })
-      .catch(function () {
-        alert("Please enter a city");
-      });
 
-      // Store search in local storage
-      if (city.val() !== "") {
-        count += 1;
-        var search = 'search-' + count;
-        localStorage.setItem(search,city.val());    
+        var cityHead = `<div class="city-name"><h2>${myCity} (${nDate}) ${icon}</h2>`;
+
+        if (i === 0 && sDate === false) {
+          output = `${cityHead} ${temp} ${wind} ${humid}`;
+          details.html(output).addClass('city-details-css');
+        } else if (sDate) {
+          card += `<div class="col-lg-2 col-md-6"> ${nDate} ${icon} ${temp} ${wind} ${humid} </div>`;
+        }        
       }
 
-      // Refresh form
-      form.reset();
-      city.focus();
+      // Return only 5 days
+      let counter = 4
+      while (counter >= 0) {
+        cards.html(card);
+        counter--;
+      }
 
-      init();
+      // Forecast text
+      cardHdr.innerHTML = `<h4>5-Day Forecast:</h4>`;
+
+    });
+
+  // Store search in local storage
+  if (citySearch !== "") {
+    count += 1;
+    let search = 'search-' + count;
+    localStorage.setItem(search, citySearch);
+  }
+
+  // Refresh form
+  form.reset();
+  city.focus();
+
+  init();
 }
 
 function init() {
-  var storage = window.localStorage;
+  var storage  = window.localStorage;
+  var listCity = '';
+  var recall   = '';
+  var getVal;   
 
-  // Retrieve saved data
+  // Retrieve saved data and build history buttons
   if (storage.length > 0) {
     for (var i=1; i <= storage.length; i++) {
-      var recall = 'search-' + i;
-      var getVal = localStorage.getItem(recall);
-      var listCity = $('<button>').addClass(recall).html(getVal);
-      if (listCity.html('')) {
-        $('.saved-cities').append(listCity);
-        console.log('no text');
-      } else {
-        listCity.replaceWith(listCity);
-        console.log('text');
-      }
+      recall = `search-${i}`;
+      getVal = localStorage.getItem(recall);
+      listCity += `<button class="search-${i} recent-search">${getVal}</button>`;
     }
-  }
+    searchList.html(listCity);
+  } 
+
+  // Get previous city search
+  $('.recent-search').on('click', function () {
+    var citySearch = $(this).html();
+    getApi(citySearch);
+  });
 }
 
 // Initiate function when search button clicked
-form.addEventListener('submit', getApi);
+form.addEventListener('submit', function (e) {
+  e.preventDefault();
+  getApi()
+});
 
 init();

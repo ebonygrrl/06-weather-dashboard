@@ -17,6 +17,7 @@ button {
     border-radius: 5px;
     border: none;
     color: #fff;
+    cursor: pointer;
     display: block;
     padding: 10px;
     width: 100%;
@@ -86,24 +87,31 @@ input:outline, input:focus, input:focus-visible {
     margin-bottom: 30px;
 }
 
-.five-day-cards > div {
+#five-day-cards > div {
     background-color: #323d4f;
     color: #fff;
     margin-bottom: 15px;
     padding: 10px;
 }
 
-.five-day-cards > div div{
+#five-day-cards > div div{
     padding: 10px 0;
 }
 
-.five-day-cards img {
+#five-day-cards img {
     display: block;
 }
 
 .main {
     margin: 0 auto;
     min-height: 83vh;
+}
+
+[class*='search-'] {
+    background-color: #aeaeae;
+    color: #000;
+    cursor: pointer;
+    margin-bottom: 15px;
 }
 
 
