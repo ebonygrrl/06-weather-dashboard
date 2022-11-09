@@ -6,7 +6,7 @@ Build a weather dashboard that will run in the browser and feature dynamically u
 
 ## Installation
 
-Click here: https://ebonygrrl.github.io/05-work-day-scheduler/
+Click here: https://ebonygrrl.github.io/06-weather-dashboard/
 
 ## Usage
 
