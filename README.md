@@ -15,7 +15,7 @@ To use this application:
 2. Click the 'Search' button or press Enter on your keyboard.
 3. Access recent searches by clicking on the buttons below the search box.
    
-Link to demo animation here: https://drive.google.com/file/d/1tz5q5Rg0TaG3wmPmHBiakvA-ChZKNx-q/view
+Link to demo animation here: https://drive.google.com/file/d/1CDw65w2uRxBkk1bf6I87bKZKWVz25_pN/view
 
 ## Demos
 
@@ -23,7 +23,7 @@ My animated demo
 
 ![My animated demo](/assets/images/weather-dashboard-tori-booker.gif)
 
-Demo provided by bootcamp
+Populated screenshot
 
 ![Populated demo](/assets/images/pop-screenshot.jpg)
 
